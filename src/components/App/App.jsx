@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState } from 'react';
+import { useState, React, useEffect } from 'react';
 import FeedbackOptions from '../FeedbackOptions/FeedbackOptions';
 import Notification from '../Notification/Notification';
 import Section from '../Section/Section';
@@ -10,7 +9,9 @@ const App = () => {
   const [good, setGood] = useState(0);
   const [neutral, setNeutral] = useState(0);
   const [bad, setBad] = useState(0);
-  const feedback = ['good', 'bad', 'neutral'];
+  const [total, setTotal] = useState(0);
+  const [percentage, setPercentage] = useState(0);
+  const feedback = ['good', 'neutral', 'bad'];
 
   const onFeedbackIncrement = name => {
     switch (name) {
@@ -28,12 +29,11 @@ const App = () => {
     }
   };
 
-  const countTotalFeedback = () => {
-    return good + neutral + bad;
-  };
-  const countPositiveFeedbackPercentage = () => {
-    return (good / countTotalFeedback()) * 100;
-  };
+  useEffect(() => {
+    const totalFeedback = good + neutral + bad;
+    setTotal(totalFeedback);
+    setPercentage(Math.ceil((good / totalFeedback) * 100));
+  }, [bad, good, neutral]);
 
   return (
     <Wrapper>
@@ -44,15 +44,15 @@ const App = () => {
         />
       </Section>
       <Section title="Statistics">
-        {countTotalFeedback() === 0 ? (
+        {total === 0 ? (
           <Notification message="There is no feedback" />
         ) : (
           <Statistics
             good={good}
             neutral={neutral}
             bad={bad}
-            total={countTotalFeedback()}
-            positivePercentage={Math.ceil(countPositiveFeedbackPercentage())}
+            total={total}
+            positivePercentage={percentage}
           />
         )}
       </Section>
